@@ -1,0 +1,9 @@
+# 运行本项目所需的第三方库
+# 版本为当前验证通过的环境（2026-08-23）；下限用 >= 以便升级，
+# 若升级后 audit_checks.py 出现新 FAIL，请回退到这些确切版本核对。
+pandas>=2.3.3
+numpy>=2.4.1
+plotly>=6.9.0          # 交互式 HTML 图表（回测输出主要形式）
+matplotlib>=3.10.8     # core/analyze_ma250.py 的静态图
+openpyxl>=3.1.5        # scripts/convert_excel_to_csv.py 读 .xlsx
+scipy>=1.17.0          # tools/audit_checks.py 的 MATH 检查（brentq 求根）

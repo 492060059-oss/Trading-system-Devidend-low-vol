@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# 编辑器 / 系统
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Claude Code 本地会话配置
+.claude/
+
+# 已退役的大体积归档（约 107MB，仍在磁盘上，只是不进 git；
+# README 说明确认新版报告无遗漏后可手工删除）
+_retired_*/
+
+# A/B 对比的中间产物：可由 build_legacy.py / run_ab.py 完全重建，不必入库
+tools/ab_compare/legacy/
+tools/ab_compare/var_*/
+tools/ab_compare/_tmp_*.csv
+
+# 审计临时文件
+output/_audit_tmp_report.md
+
+# 说明：output/ 下的回测结果【故意不忽略】。
+# 报告与图表是本项目的研究结论载体，需要可追溯、可比对历史版本。

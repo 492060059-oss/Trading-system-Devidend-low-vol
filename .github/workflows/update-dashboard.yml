@@ -1,0 +1,50 @@
+name: Update dashboard
+
+# 每交易日（北京时间）收盘后自动拉取最新数据并重建看板：
+#   19:30 首次运行（中证官网通常收盘后数小时内发布当日数据）
+#   22:00 二次运行兜底（数据发布较晚或首次失败时补上）
+# 手动触发：GitHub 仓库页面 -> Actions -> Update dashboard -> Run workflow
+on:
+  schedule:
+    - cron: '30 11 * * 1-5'   # UTC 11:30 = 北京 19:30
+    - cron: '0 14 * * 1-5'    # UTC 14:00 = 北京 22:00
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-dashboard
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install deps
+        run: pip install pandas numpy plotly
+
+      - name: Update data
+        run: python scripts/update_data.py
+
+      - name: Build dashboard
+        run: python scripts/build_dashboard.py
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore(data): auto update $(date -u -d '+8 hours' '+%Y-%m-%d')"
+            git push
+          fi
