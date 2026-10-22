@@ -128,8 +128,11 @@ python scripts/build_dashboard.py  # 生成 docs/index.html（乖离率/RSI/均�
 
 推送 GitHub 并启用 Pages 后，`.github/workflows/update-dashboard.yml` 会在
 **每交易日 19:30 / 22:00（北京时间）** 自动拉数据、重建看板并提交，
-手机访问 `https://<用户名>.github.io/<仓库名>/` 即可查看。一次性配置步骤与
-信号灯的历史检验结论见 `docs/DASHBOARD_GUIDE.md`。
+手机访问 `https://<用户名>.github.io/<仓库名>/` 即可查看。
+
+**备选：Render.com 实时渲染**（`dashboard_app.py`，打开页面时现拉现算，ETF 盘中
+可看当日价）——同一仓库连接 Render 即可，配置由 `render.yaml` 自动带入，
+两种部署可共存。一次性配置步骤与信号灯的历史检验结论见 `docs/DASHBOARD_GUIDE.md`。
 
 数据写入纪律：`H20269历史数据.csv` **只追加**（旧回测可复现）；512890 看板
 用独立文件 `512890行情数据.csv`（全量刷新），回测原文件不动。

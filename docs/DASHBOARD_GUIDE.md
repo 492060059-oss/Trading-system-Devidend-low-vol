@@ -11,6 +11,8 @@
 | 看板生成脚本 | `scripts/build_dashboard.py` | 读 `data/` 两个 CSV → 生成 `docs/index.html` |
 | 定时任务 | `.github/workflows/update-dashboard.yml` | 每交易日 19:30 / 22:00（北京时间）自动运行并提交 |
 | 看板页面 | `docs/index.html` | GitHub Pages 发布的手机友好静态页 |
+| 实时渲染模块 | `scripts/dashboard_live.py` | 现场拉数现算（不落盘），三级数据兜底 |
+| Web 服务入口 | `dashboard_app.py` + `render.yaml` | Render 免费实例部署的实时看板（见第五节） |
 
 ## 二、数据源（均免费、无需鉴权，2026-10-23 实测）
 
@@ -57,7 +59,33 @@ python scripts/build_dashboard.py       # 重新生成 docs/index.html
    注意：仓库 Settings → Actions → General → Workflow permissions 需选
    **Read and write permissions**（默认即允许，若推送失败优先查这里）。
 
-## 五、看板信号定义（2026-10 历史检验结论）
+## 五、备选：Render.com 实时渲染部署（dashboard_app.py）
+
+与 GitHub Pages 的"定时生成静态页"不同，Render 方案是**打开页面时实时拉数现算**
+（`dashboard_app.py` + `scripts/dashboard_live.py`，10 分钟缓存）：
+
+- 数据永远最新，**512890 部分盘中打开也能看到当日价格**（东财/腾讯接口盘中可用）；
+- H20269 实时源为收盘数据，当日值要等中证官网收盘后发布；
+- 数据链路三级兜底：中证API/东财/腾讯 → 任一失败退回仓库 CSV（页面会标注）。
+
+**为什么仍需要一个 git 仓库**：Render 控制台建服务必须连接 GitHub/GitLab 仓库；
+它唯一免 git 的通道（CLI 直传）不支持 Windows。因此仓库在这里只是"存代码的网盘"，
+推送一次后日常零操作（`render.yaml` 里 `autoDeploy: false`，数据更新不触发重建）。
+
+部署步骤：
+1. 把本仓库推到 GitHub（见第四节步骤 1~2，Pages 不用开）。
+2. [render.com](https://render.com) 注册（邮箱即可）→ New → **Web Service** →
+   连接该 GitHub 仓库 → Render 读取 `render.yaml` 自动填好配置 → Create。
+3. 等首次构建完成（约 2~3 分钟），访问 `https://<服务名>.onrender.com/`。
+
+注意事项：
+- 免费实例**闲置 15 分钟休眠**，休眠后首次访问需 30~60 秒唤醒。手机常用的话，
+  可在 [uptimerobot.com](https://uptimerobot.com)（免费）加一个每 10 分钟 ping
+  `https://<服务名>.onrender.com/healthz` 的监控保活；
+- 国内直连 onrender.com 一般可用，速度一般；若嫌慢可回退 GitHub Pages 方案（两者共存）；
+- 本地体验同款服务：`python dashboard_app.py` → http://127.0.0.1:10000 。
+
+## 六、看板信号定义（2026-10 历史检验结论）
 
 看板上的四个信号灯（H20269 为主，512890 同样计算但阈值仅供参照）：
 
@@ -77,7 +105,7 @@ python scripts/build_dashboard.py       # 重新生成 docs/index.html
 （当日 512890 放量 2.6 倍下跌）→ 10-19 S1 顶背离 + 乖离率 +5.15% 见阶段顶
 24960 → 10-20 S2 再次触发 → 10-22 S3 破 MA20 确认，三日累计 -3.0%。
 
-## 六、维护备注
+## 七、维护备注
 
 - 中证官网 API 若未来改版（返回 400/500），先查 akshare
   `index_stock_zh_csindex` 的最新实现（本项目 2026-10 参数即来自它）。

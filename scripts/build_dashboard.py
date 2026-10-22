@@ -331,18 +331,15 @@ S3 破位确认：反弹情景下（90 日内乖离率曾<0、10 日内曾≥+4%
 """
 
 
-def main():
-    idx = compute_indicators(pd.read_csv('data/H20269历史数据.csv', encoding='utf-8-sig'))
-    idx['日期'] = pd.to_datetime(idx['日期'])
-    etf = compute_indicators(pd.read_csv('data/512890行情数据.csv', encoding='utf-8-sig'))
-    etf['日期'] = pd.to_datetime(etf['日期'])
+def assemble_html(idx, etf, source_note=''):
+    """把两个标的的指标 DataFrame 组装成完整看板 HTML（静态构建与实时渲染共用）。"""
     for df, name in [(idx, 'H20269'), (etf, '512890')]:
         if df['MA250'].iloc[-1] != df['MA250'].iloc[-1]:  # NaN 检查
             raise RuntimeError(f'{name}: 最新一日 MA250 为空，数据不足')
-
     now = beijing_now()
     asof = max(idx['日期'].iloc[-1], etf['日期'].iloc[-1]).strftime('%Y-%m-%d')
-    html = f"""<!DOCTYPE html>
+    note = f' · {source_note}' if source_note else ''
+    return f"""<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
@@ -354,14 +351,21 @@ def main():
 <body>
 <div class="wrap">
 <h1>红利低波 · 每日指标看板</h1>
-<div class="meta">数据截至 {asof} 收盘 · 生成于 {now.strftime('%Y-%m-%d %H:%M')}（北京时间）
-· 每交易日收盘后自动更新</div>
+<div class="meta">数据截至 {asof} 收盘 · 生成于 {now.strftime('%Y-%m-%d %H:%M')}（北京时间）{note}</div>
 {section(idx, 'H20269', '红利低波全收益指数（主策略标的）', True)}
 {section(etf, '512890', '红利低波ETF（前复权）', False)}
 {FOOT}
 </div>
 </body>
 </html>"""
+
+
+def main():
+    idx = compute_indicators(pd.read_csv('data/H20269历史数据.csv', encoding='utf-8-sig'))
+    idx['日期'] = pd.to_datetime(idx['日期'])
+    etf = compute_indicators(pd.read_csv('data/512890行情数据.csv', encoding='utf-8-sig'))
+    etf['日期'] = pd.to_datetime(etf['日期'])
+    html = assemble_html(idx, etf)
     with open(OUT_PATH, 'w', encoding='utf-8') as f:
         f.write(html)
     print(f'已生成 {OUT_PATH}（{len(html)/1024:.0f} KB）')
