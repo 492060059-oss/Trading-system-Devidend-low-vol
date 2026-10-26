@@ -15,8 +15,8 @@
    data/512890历史数据.csv 保持不动，以免破坏旧回测的复现性。
 
 用法：
-    python scripts/update_data.py          # 更新两个文件
-    python scripts/update_data.py --check  # 只查看数据新旧，不写任何文件
+    python scripts/data/update_data.py          # 更新两个文件
+    python scripts/data/update_data.py --check  # 只查看数据新旧，不写任何文件
 
 本地可挂 Windows 计划任务每日运行；GitHub Actions 中由
 .github/workflows/update-dashboard.yml 定时调用。
@@ -27,7 +27,7 @@
 # 使代码中所有 'data/...'、'output/...' 相对路径继续生效（无需逐个改写）。
 import os as _os
 import sys as _sys
-_ROOT = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
+_ROOT = _os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
 for _p in (_ROOT, _os.path.join(_ROOT, 'core')):
     if _p not in _sys.path:
         _sys.path.insert(0, _p)

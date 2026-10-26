@@ -378,7 +378,7 @@ class PerformanceAnalyzer:
                     '**缺少静态混合基准**（它需要 cash_return_rate 与逐日现金'
                     '计息口径）。如需完整三方对照，请通过 '
                     '`PerformanceAnalyzer.from_backtest(csv, bt)` 构造，'
-                    '或直接运行 scripts/run_*_backtests.py。')
+                    '或直接运行 scripts/backtest/run_*_backtests.py。')
 
         rows = {'策略': strat, '满仓基准': bench}
         if blend is not None:
@@ -872,7 +872,7 @@ class PerformanceAnalyzer:
         if bt is None:
             f.write("> 本次分析未接入回测器实例，策略参数不可用。"
                     "如需完整参数，请通过 `PerformanceAnalyzer.from_backtest(csv, bt)` "
-                    "构造，或直接运行 `scripts/run_*_backtests.py`。\n")
+                    "构造，或直接运行 `scripts/backtest/run_*_backtests.py`。\n")
             return
         m = self.metrics or {}
         f.write("| 参数 | 值 | 含义 |\n|------|-----|------|\n")

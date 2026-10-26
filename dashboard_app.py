@@ -3,7 +3,7 @@
 红利低波 · 每日指标看板 —— Web 服务入口（Render.com 免费实例 / 本地均可运行）
 
 零 Web 框架依赖（标准库 http.server），启动后：
-    GET /          实时渲染看板（scripts/dashboard_live.py，10 分钟缓存）
+    GET /          实时渲染看板（scripts/dashboard/dashboard_live.py，10 分钟缓存）
     GET /healthz   健康检查（配合外部保活 ping）
 本地运行：  python dashboard_app.py            （默认 http://127.0.0.1:10000）
 Render 运行：自动注入 PORT 环境变量，配置见 render.yaml
@@ -13,7 +13,8 @@ import sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(ROOT, 'scripts'))
+sys.path.insert(0, os.path.join(ROOT, 'scripts', 'dashboard'))
+sys.path.insert(0, os.path.join(ROOT, 'scripts', 'data'))
 
 from dashboard_live import get_dashboard_html  # noqa: E402
 

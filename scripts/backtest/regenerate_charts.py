@@ -25,7 +25,7 @@
 # 使代码中所有 'data/...'、'output/...' 相对路径继续生效（无需逐个改写）。
 import os as _os
 import sys as _sys
-_ROOT = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
+_ROOT = _os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
 for _p in (_ROOT, _os.path.join(_ROOT, 'core')):
     if _p not in _sys.path:
         _sys.path.insert(0, _p)
@@ -145,7 +145,7 @@ def main():
     #   ② 子图①的横向比较已被 output/backtests/横向统计报告.md 完整覆盖，且后者
     #      多出年化/夏普/索提诺/同仓位混合超额与分阶段胜负明细；
     #   ③ 曲线对比改为 21 组【超额】曲线：横向统计_超额曲线对比.html。
-    # 替代命令： python scripts/build_cross_group_report.py
+    # 替代命令： python scripts/backtest/build_cross_group_report.py
     print("\n--- 跨起始日对比图已移除，改由 build_cross_group_report.py 生成 ---")
     print("    -> 横向统计报告.md / 横向统计_超额曲线对比.html")
 

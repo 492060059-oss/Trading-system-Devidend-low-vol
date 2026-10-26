@@ -22,17 +22,21 @@
 │   ├── data_calculator.py             # MA250、乖离率等指标计算
 │   └── analyze_ma250.py               # MA250 静态图分析（matplotlib）
 │
-├── scripts/               # 可执行入口
-│   ├── run_multiple_backtests.py      # 3 个主力起始日回测
-│   ├── run_extended_backtests.py      # H20269 扩展 10 起始日（市场情景覆盖）
-│   ├── run_512890_backtests.py        # 512890 ETF 5 起始日（真实可交易标的）
-│   ├── run_orphan_backtests.py        # 3 组历史手工回测组（补齐无人负责的死角）
-│   ├── build_cross_group_report.py    # ★ 21 组横向统计报告（全量指标 + 分阶段归因）
-│   ├── regenerate_charts.py           # 不重跑回测，仅重画全部图表
-│   ├── generate_rsi_report.py         # RSI 止盈决策分析报告
-│   ├── convert_excel_to_csv.py        # H30269perf.xlsx → CSV（旧手工流程）
-│   ├── update_data.py                 # ★ 每日自动拉取最新数据（中证API+东财/腾讯）
-│   └── build_dashboard.py             # ★ 生成手机看板 docs/index.html
+├── scripts/               # 可执行入口（按功能分三组，见 scripts/README.md）
+│   ├── data/                          # 数据获取与更新
+│   │   ├── update_data.py             # ★ 每日自动拉取最新数据（中证API+东财/腾讯）
+│   │   └── convert_excel_to_csv.py    # H30269perf.xlsx → CSV（旧手工流程）
+│   ├── dashboard/                     # 手机看板
+│   │   ├── build_dashboard.py         # ★ 生成手机看板 docs/index.html
+│   │   └── dashboard_live.py          # 实时渲染模块（根目录 dashboard_app.py 调用）
+│   └── backtest/                      # 策略回测与研究报告
+│       ├── run_multiple_backtests.py      # 3 个主力起始日回测
+│       ├── run_extended_backtests.py      # H20269 扩展 10 起始日（市场情景覆盖）
+│       ├── run_512890_backtests.py        # 512890 ETF 5 起始日（真实可交易标的）
+│       ├── run_orphan_backtests.py        # 3 组历史手工回测组（补齐无人负责的死角）
+│       ├── build_cross_group_report.py    # ★ 21 组横向统计报告（全量指标 + 分阶段归因）
+│       ├── regenerate_charts.py           # 不重跑回测，仅重画全部图表
+│       └── generate_rsi_report.py         # RSI 止盈决策分析报告
 │
 ├── tools/                 # 审计与验证工具（研究可信度的保障）
 │   ├── audit_checks.py                # 16 项自动审计，逐项 PASS/FAIL
@@ -53,6 +57,8 @@
 │   ├── ANALYZE_MA250_GUIDE.md         # MA250 分析工具说明
 │   ├── PROJECT_REORGANIZATION_PLAN.md # 本次重构方案（已执行）
 │   ├── DASHBOARD_GUIDE.md             # ★ 每日数据更新与手机看板说明
+│   ├── GitHub入门教程.md               # Git/GitHub 新手教程（推送/日常三连/数据分离问答）
+│   ├── 股息率调研.md                   # H20269/H30269/512890 股息率口径与免费数据源
 │   └── index.html                     # 看板页面（GitHub Pages 发布对象）
 │
 ├── data/                  # 原始行情数据（CSV / XLSX）
@@ -82,7 +88,7 @@
 - **需要时的重跑方式**：
   ```bash
   python core/analyze_ma250.py            # → output/analysis/（同名覆盖）
-  python scripts/generate_rsi_report.py   # → output/reports/（按数据末日命名）
+  python scripts/backtest/generate_rsi_report.py   # → output/reports/（按数据末日命名）
   ```
   RSI 报告文件名中的日期取自**数据最后一天**（`data_end_date`），不是写死的：
   数据更新后重跑会**新增**一个新日期的文件，不覆盖旧的 —— 旧报告会留在目录里，
@@ -94,20 +100,20 @@
 pip install -r requirements.txt
 
 # 主力回测：3 个起始日
-python scripts/run_multiple_backtests.py
+python scripts/backtest/run_multiple_backtests.py
 
 # 扩展情景：H20269 10 个起始日 / 512890 ETF 5 个起始日
-python scripts/run_extended_backtests.py
-python scripts/run_512890_backtests.py
+python scripts/backtest/run_extended_backtests.py
+python scripts/backtest/run_512890_backtests.py
 
 # 3 组历史手工回测组（别漏掉，含审计脚本的默认引用组）
-python scripts/run_orphan_backtests.py
+python scripts/backtest/run_orphan_backtests.py
 
 # ★ 21 组横向统计报告（累计/年化/回撤/夏普/索提诺/同仓位混合超额 + 分阶段胜负）
-python scripts/build_cross_group_report.py
+python scripts/backtest/build_cross_group_report.py
 
 # 只重画图（不重跑回测，快得多）
-python scripts/regenerate_charts.py
+python scripts/backtest/regenerate_charts.py
 
 # 审计：验证 8 个已修 bug 未回归 + 查看仍未通过的检验
 python tools/audit_checks.py
@@ -122,8 +128,8 @@ python tools/audit_checks.py
 不再需要去中证指数官网手动下载 xlsx：
 
 ```bash
-python scripts/update_data.py      # H20269 官网API增量追加 + 512890 前复权全量刷新
-python scripts/build_dashboard.py  # 生成 docs/index.html（乖离率/RSI/均线/止盈信号灯）
+python scripts/data/update_data.py      # H20269 官网API增量追加 + 512890 前复权全量刷新
+python scripts/dashboard/build_dashboard.py  # 生成 docs/index.html（乖离率/RSI/均线/止盈信号灯）
 ```
 
 推送 GitHub 并启用 Pages 后，`.github/workflows/update-dashboard.yml` 会在
@@ -170,5 +176,5 @@ python tools/ab_compare/make_report.py
   若今后再改动 `core/`，请重跑以下三个脚本 + `run_orphan_backtests.py`，
   否则报告会与代码脱节。
 - ⚠️ 有 3 组回测（两个 `2015-05起_*` 与 `2026-05起_50万本金`）历史上是手工跑的，
-  现由 `scripts/run_orphan_backtests.py` 负责 —— **别忘了它**，
+  现由 `scripts/backtest/run_orphan_backtests.py` 负责 —— **别忘了它**，
   其中 `2015-05起_深度定投策略` 是审计脚本的默认引用组。

@@ -17,8 +17,9 @@
 # 使代码中所有 'data/...'、'output/...' 相对路径继续生效（无需逐个改写）。
 import os as _os
 import sys as _sys
-_ROOT = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
-for _p in (_ROOT, _os.path.join(_ROOT, 'core')):
+_ROOT = _os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
+for _p in (_ROOT, _os.path.join(_ROOT, 'core'),
+              _os.path.join(_ROOT, 'scripts', 'data')):
     if _p not in _sys.path:
         _sys.path.insert(0, _p)
 if _os.path.abspath(_os.getcwd()) != _ROOT:
@@ -29,8 +30,8 @@ import time
 
 import pandas as pd
 
-import build_dashboard as bd   # noqa: E402  (scripts/ 已由调用方挂入 sys.path)
-import update_data as ud       # noqa: E402
+import build_dashboard as bd   # noqa: E402  (scripts/dashboard/ 已挂入 sys.path)
+import update_data as ud       # noqa: E402  (scripts/data/ 已挂入 sys.path)
 
 # 拉约 5 年半：MA250 需 250 日 + RSI(Wilder ewm) 预热收敛 + 近2年图表窗口，足够
 HISTORY_START = '20210101'

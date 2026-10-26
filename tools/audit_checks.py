@@ -77,12 +77,14 @@ def src_path(fn):
     找不到时【抛异常而非返回 None】：静态检查若因文件搬走而静默跳过，
     会把"没检查"伪装成"没问题"—— 那正是本审计要防的事。
     """
-    for sub in ('', 'core', 'scripts', 'tools'):
+    for sub in ('', 'core', 'scripts', 'scripts/data', 'scripts/dashboard',
+                'scripts/backtest', 'tools'):
         p = os.path.join(sub, fn) if sub else fn
         if os.path.exists(p):
             return p
     raise FileNotFoundError(
-        f'审计找不到源码 {fn}（已在 ./ core/ scripts/ tools/ 下搜索）。'
+        f'审计找不到源码 {fn}（已在 ./ core/ scripts/ scripts/{{data,dashboard,backtest}}/'
+        f' tools/ 下搜索）。'
         f'若文件被重命名或移动，请更新 src_path 的搜索范围 —— '
         f'不要让静态检查静默跳过。')
 

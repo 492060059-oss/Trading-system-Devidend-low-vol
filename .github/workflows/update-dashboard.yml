@@ -32,10 +32,10 @@ jobs:
         run: pip install pandas numpy plotly
 
       - name: Update data
-        run: python scripts/update_data.py
+        run: python scripts/data/update_data.py
 
       - name: Build dashboard
-        run: python scripts/build_dashboard.py
+        run: python scripts/dashboard/build_dashboard.py
 
       - name: Commit and push
         run: |

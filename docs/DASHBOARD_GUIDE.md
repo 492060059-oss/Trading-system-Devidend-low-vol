@@ -7,11 +7,11 @@
 
 | 组件 | 路径 | 作用 |
 |---|---|---|
-| 数据更新脚本 | `scripts/update_data.py` | 拉取最新数据并写入 `data/`（支持 `--check` 只读模式） |
-| 看板生成脚本 | `scripts/build_dashboard.py` | 读 `data/` 两个 CSV → 生成 `docs/index.html` |
+| 数据更新脚本 | `scripts/data/update_data.py` | 拉取最新数据并写入 `data/`（支持 `--check` 只读模式） |
+| 看板生成脚本 | `scripts/dashboard/build_dashboard.py` | 读 `data/` 两个 CSV → 生成 `docs/index.html` |
 | 定时任务 | `.github/workflows/update-dashboard.yml` | 每交易日 19:30 / 22:00（北京时间）自动运行并提交 |
 | 看板页面 | `docs/index.html` | GitHub Pages 发布的手机友好静态页 |
-| 实时渲染模块 | `scripts/dashboard_live.py` | 现场拉数现算（不落盘），三级数据兜底 |
+| 实时渲染模块 | `scripts/dashboard/dashboard_live.py` | 现场拉数现算（不落盘），三级数据兜底 |
 | Web 服务入口 | `dashboard_app.py` + `render.yaml` | Render 免费实例部署的实时看板（见第五节） |
 
 ## 二、数据源（均免费、无需鉴权，2026-10-23 实测）
@@ -31,9 +31,9 @@
 ## 三、本地使用
 
 ```bash
-python scripts/update_data.py           # 更新数据（可挂 Windows 计划任务）
-python scripts/update_data.py --check   # 只看数据新旧，不写文件
-python scripts/build_dashboard.py       # 重新生成 docs/index.html
+python scripts/data/update_data.py           # 更新数据（可挂 Windows 计划任务）
+python scripts/data/update_data.py --check   # 只看数据新旧，不写文件
+python scripts/dashboard/build_dashboard.py       # 重新生成 docs/index.html
 ```
 
 本地直接双击打开 `docs/index.html` 也能看（图表库走 CDN，需联网）。
@@ -62,7 +62,7 @@ python scripts/build_dashboard.py       # 重新生成 docs/index.html
 ## 五、备选：Render.com 实时渲染部署（dashboard_app.py）
 
 与 GitHub Pages 的"定时生成静态页"不同，Render 方案是**打开页面时实时拉数现算**
-（`dashboard_app.py` + `scripts/dashboard_live.py`，10 分钟缓存）：
+（`dashboard_app.py` + `scripts/dashboard/dashboard_live.py`，10 分钟缓存）：
 
 - 数据永远最新，**512890 部分盘中打开也能看到当日价格**（东财/腾讯接口盘中可用）；
 - H20269 实时源为收盘数据，当日值要等中证官网收盘后发布；

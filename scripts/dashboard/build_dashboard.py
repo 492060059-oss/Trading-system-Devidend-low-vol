@@ -11,7 +11,7 @@
 内容：双标的的 年线乖离率（含策略区间条）、RSI6/12/24、MA20/60/120/250、
 近20日明细，以及三个经历史检验的中期止盈信号状态灯（定义见页脚）。
 
-用法：python scripts/build_dashboard.py（先运行 update_data.py）
+用法：python scripts/dashboard/build_dashboard.py（先运行 update_data.py）
 """
 # === PROJECT-ROOT BOOTSTRAP ===
 # 重构后代码分层（core/ scripts/ tools/），此前言保证脚本从任何目录调用都可用：
@@ -19,7 +19,7 @@
 # 使代码中所有 'data/...'、'output/...' 相对路径继续生效（无需逐个改写）。
 import os as _os
 import sys as _sys
-_ROOT = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
+_ROOT = _os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
 for _p in (_ROOT, _os.path.join(_ROOT, 'core')):
     if _p not in _sys.path:
         _sys.path.insert(0, _p)

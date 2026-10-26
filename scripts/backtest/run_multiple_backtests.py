@@ -6,7 +6,7 @@
 1. 运行完整回测（含深度定投、快照启动）
 2. 生成时间维度分析（HTML 可视化 + MD 报告）
 
-横向对比不在本脚本内生成 —— 见 scripts/build_cross_group_report.py
+横向对比不在本脚本内生成 —— 见 scripts/backtest/build_cross_group_report.py
 （21 组统一口径的横向统计报告，已取代原 comparisons/ 汇总产物）。
 """
 # === PROJECT-ROOT BOOTSTRAP ===
@@ -15,7 +15,7 @@
 # 使代码中所有 'data/...'、'output/...' 相对路径继续生效（无需逐个改写）。
 import os as _os
 import sys as _sys
-_ROOT = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
+_ROOT = _os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
 for _p in (_ROOT, _os.path.join(_ROOT, 'core')):
     if _p not in _sys.path:
         _sys.path.insert(0, _p)
@@ -109,7 +109,7 @@ def run_single(start_date, output_dir):
 #   ② 都只对满仓指数报超额，缺同仓位混合基准，分不清"择时"与"低仓位"；
 #   ③ html 子图②「不同起点的基准累计收益率」是同一条价格序列的多次
 #      重新归一化（实测逐日绝对差 = 0.0000000000），不含新信息。
-# 替代产物：python scripts/build_cross_group_report.py
+# 替代产物：python scripts/backtest/build_cross_group_report.py
 #   -> 横向统计报告.md / 横向统计_指标总表.csv
 #      / 横向统计_分阶段明细.csv / 横向统计_超额曲线对比.html
 # ============================================================
@@ -139,5 +139,5 @@ if __name__ == '__main__':
         print(f"    ├─ H20269_滚动仓位交易记录.csv")
         print(f"    ├─ 时间维度分析_综合可视化.html")
         print(f"    └─ 时间维度分析报告.md")
-    print(f"\n横向对比请运行：python scripts/build_cross_group_report.py")
+    print(f"\n横向对比请运行：python scripts/backtest/build_cross_group_report.py")
     print(f"  └─ output/backtests/横向统计报告.md（21 组统一口径）")

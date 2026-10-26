@@ -20,13 +20,13 @@
     任何标的（H20269 / 512890）都可套用；每组只统计与自身数据区间相交的阶段。
 
 用法：
-    python scripts/build_cross_group_report.py
+    python scripts/backtest/build_cross_group_report.py
 """
 
 # === PROJECT-ROOT BOOTSTRAP ===
 import os as _os
 import sys as _sys
-_ROOT = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
+_ROOT = _os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
 for _p in (_ROOT, _os.path.join(_ROOT, 'core')):
     if _p not in _sys.path:
         _sys.path.insert(0, _p)
@@ -157,7 +157,7 @@ def main():
         if not os.path.exists(daily_csv):
             raise FileNotFoundError(
                 f'缺少每日记录: {daily_csv}\n'
-                f'  请先运行对应脚本生成该组产物（scripts/run_*.py）。\n'
+                f'  请先运行对应脚本生成该组产物（scripts/backtest/run_*.py）。\n'
                 f'  本报告【拒绝跳过缺失组】—— 静默少统计一组，会让"21 组"变成谎话。')
 
         print(f'  [{src:12}] {gid}')
@@ -172,7 +172,7 @@ def main():
                 f'{out_dir}: vintage 不一致 —— 重跑累计 {m["策略累计收益率"]:.6f}% '
                 f'vs 磁盘每日记录末值推算 {disk_cum:.6f}%（差 '
                 f'{disk_cum - m["策略累计收益率"]:+.6f} pp）。\n'
-                f'  说明磁盘产物由旧代码生成，请先重跑对应 scripts/run_*.py 再生成本报告。')
+                f'  说明磁盘产物由旧代码生成，请先重跑对应 scripts/backtest/run_*.py 再生成本报告。')
 
         # 逐阶段判定（含持平口径与冷启动残片标记）
         marks = [classify(r['超额阶段收益%'], r['交易日数']) for _, r in pdf.iterrows()]
@@ -241,7 +241,7 @@ def write_md(df, pdf_all):
     with io.open(OUT_MD, 'w', encoding='utf-8') as f:
         w = f.write
         w('# 横向统计报告：21 组回测全量指标 + 分阶段归因\n\n')
-        w(f'**生成脚本**：`scripts/build_cross_group_report.py`　'
+        w(f'**生成脚本**：`scripts/backtest/build_cross_group_report.py`　'
           f'**组数**：{len(df)}（H20269 {len(h)} + 512890 {len(e)}）　'
           f'**阶段行数**：{len(pdf_all)}\n\n')
 
@@ -435,11 +435,11 @@ def write_md(df, pdf_all):
         w('---\n\n')
         w('## 5. 数据来源与复现\n\n')
         w('```bash\n')
-        w('python scripts/run_multiple_backtests.py    # 3 组\n')
-        w('python scripts/run_extended_backtests.py    # 10 组\n')
-        w('python scripts/run_512890_backtests.py      # 5 组（ETF）\n')
-        w('python scripts/run_orphan_backtests.py      # 3 组\n')
-        w('python scripts/build_cross_group_report.py  # 本报告\n')
+        w('python scripts/backtest/run_multiple_backtests.py    # 3 组\n')
+        w('python scripts/backtest/run_extended_backtests.py    # 10 组\n')
+        w('python scripts/backtest/run_512890_backtests.py      # 5 组（ETF）\n')
+        w('python scripts/backtest/run_orphan_backtests.py      # 3 组\n')
+        w('python scripts/backtest/build_cross_group_report.py  # 本报告\n')
         w('```\n\n')
         w('指标口径与各组回测**完全同源**（本脚本 import `RollingPositionBacktest`\n')
         w('与 `PerformanceAnalyzer`，不另行实现任何公式）。阶段划分取 `MARKET_PHASES`\n')
