@@ -1,9 +1,9 @@
-name: Update dashboard
+name: Update data
 
-# 每交易日（北京时间）收盘后自动拉取最新数据并重建看板：
+# 每交易日（北京时间）收盘后自动拉取最新行情并提交回仓库 —— 数据留档：
 #   19:30 首次运行（中证官网通常收盘后数小时内发布当日数据）
 #   22:00 二次运行兜底（数据发布较晚或首次失败时补上）
-# 手动触发：GitHub 仓库页面 -> Actions -> Update dashboard -> Run workflow
+# 手动触发：GitHub 仓库页面 -> Actions -> Update data -> Run workflow
 on:
   schedule:
     - cron: '30 11 * * 1-5'   # UTC 11:30 = 北京 19:30
@@ -14,7 +14,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: update-dashboard
+  group: update-data
   cancel-in-progress: false
 
 jobs:
@@ -29,13 +29,10 @@ jobs:
           cache: pip
 
       - name: Install deps
-        run: pip install pandas numpy plotly
+        run: pip install pandas numpy
 
       - name: Update data
         run: python scripts/data/update_data.py
-
-      - name: Build dashboard
-        run: python scripts/dashboard/build_dashboard.py
 
       - name: Commit and push
         run: |

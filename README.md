@@ -22,13 +22,10 @@
 │   ├── data_calculator.py             # MA250、乖离率等指标计算
 │   └── analyze_ma250.py               # MA250 静态图分析（matplotlib）
 │
-├── scripts/               # 可执行入口（按功能分三组，见 scripts/README.md）
-│   ├── data/                          # 数据获取与更新
+├── scripts/               # 可执行入口（按功能分两组，见 scripts/README.md）
+│   ├── data/                          # 数据获取与更新（每日留档）
 │   │   ├── update_data.py             # ★ 每日自动拉取最新数据（中证API+东财/腾讯）
 │   │   └── convert_excel_to_csv.py    # H30269perf.xlsx → CSV（旧手工流程）
-│   ├── dashboard/                     # 手机看板
-│   │   ├── build_dashboard.py         # ★ 生成手机看板 docs/index.html
-│   │   └── dashboard_live.py          # 实时渲染模块（根目录 dashboard_app.py 调用）
 │   └── backtest/                      # 策略回测与研究报告
 │       ├── run_multiple_backtests.py      # 3 个主力起始日回测
 │       ├── run_extended_backtests.py      # H20269 扩展 10 起始日（市场情景覆盖）
@@ -55,11 +52,8 @@
 │   ├── STRATEGY_DESIGN.md             # 策略设计思路
 │   ├── RSI_ANALYSIS_FRAMEWORK.md      # RSI 分析框架
 │   ├── ANALYZE_MA250_GUIDE.md         # MA250 分析工具说明
-│   ├── PROJECT_REORGANIZATION_PLAN.md # 本次重构方案（已执行）
-│   ├── DASHBOARD_GUIDE.md             # ★ 每日数据更新与手机看板说明
-│   ├── GitHub入门教程.md               # Git/GitHub 新手教程（推送/日常三连/数据分离问答）
-│   ├── 股息率调研.md                   # H20269/H30269/512890 股息率口径与免费数据源
-│   └── index.html                     # 看板页面（GitHub Pages 发布对象）
+│   ├── progress_archive.md            # 早期进度存档（封存只读）
+│   └── PROJECT_REORGANIZATION_PLAN.md # 本次重构方案（已执行）
 │
 ├── data/                  # 原始行情数据（CSV / XLSX）
 └── output/                # 全部产物
@@ -73,6 +67,10 @@
     ├── analysis/                       # ⚠️ 历史专题，不在主线（MA250 静态图）
     └── reports/                        # ⚠️ 历史专题，不在主线（RSI 止盈分析）
 ```
+
+> 📦 **副项目拆分（2026-10-27）**：GitHub 教程、股息率调研、在线看板等与交易系统
+> 无直接关系的材料已移至兄弟目录 `../红利低波_副项目/`
+> （`01_GitHub教程` / `02_股息率研究` / `03_在线看板`），主仓库只保留交易系统本体。
 
 ### 关于「历史专题，不在主线」
 
@@ -123,25 +121,24 @@ python tools/audit_checks.py
 前言，负责把项目根与 `core/` 挂到 `sys.path` 并把工作目录切到项目根。
 因此代码里的 `data/...`、`output/...` 相对路径始终有效。
 
-## 每日数据自动更新与手机看板（2026-10-23 新增）
+## 每日数据自动更新（数据留档，2026-10-23 新增）
 
 不再需要去中证指数官网手动下载 xlsx：
 
 ```bash
-python scripts/data/update_data.py      # H20269 官网API增量追加 + 512890 前复权全量刷新
-python scripts/dashboard/build_dashboard.py  # 生成 docs/index.html（乖离率/RSI/均线/止盈信号灯）
+python scripts/data/update_data.py           # H20269 官网API增量追加 + 512890 前复权全量刷新
+python scripts/data/update_data.py --check   # 只看数据新旧，不写文件
 ```
 
-推送 GitHub 并启用 Pages 后，`.github/workflows/update-dashboard.yml` 会在
-**每交易日 19:30 / 22:00（北京时间）** 自动拉数据、重建看板并提交，
-手机访问 `https://<用户名>.github.io/<仓库名>/` 即可查看。
+推送 GitHub 后，`.github/workflows/update-data.yml` 会在
+**每交易日 19:30 / 22:00（北京时间）** 自动拉数据并提交回仓库——
+数据变化全程留档，可随时在网页 Commits 页回看任何一天的快照。
 
-**备选：Render.com 实时渲染**（`dashboard_app.py`，打开页面时现拉现算，ETF 盘中
-可看当日价）——同一仓库连接 Render 即可，配置由 `render.yaml` 自动带入，
-两种部署可共存。一次性配置步骤与信号灯的历史检验结论见 `docs/DASHBOARD_GUIDE.md`。
+数据写入纪律：`H20269历史数据.csv` **只追加**（旧回测可复现）；512890 用
+独立文件 `512890行情数据.csv`（全量刷新），回测原文件 `512890历史数据.csv` 不动。
 
-数据写入纪律：`H20269历史数据.csv` **只追加**（旧回测可复现）；512890 看板
-用独立文件 `512890行情数据.csv`（全量刷新），回测原文件不动。
+> 📱 手机看板（乖离率/RSI/均线/止盈信号灯）已拆出为副项目：
+> `../红利低波_副项目/03_在线看板/`（含代码、部署指南与最新生成页面），需要时再启用。
 
 ## 复现「改前 / 改后」对比
 
@@ -170,7 +167,7 @@ python tools/ab_compare/make_report.py
 
 - 本项目已于 2026-10-23 初始化为 git 仓库（此前无版本控制，历史产物靠
   `_retired_2026-08-23/` 等目录手工归档；该目录体积过大**未入库**，仍在磁盘上）。
-  推送 GitHub 后方可启用每日自动更新与 Pages 看板。
+  推送 GitHub 后即可启用每日数据自动留档（`update-data.yml`）。
 - `output/` 下 16 组回测已于 2026-08-23 用修复后代码全部重跑，并与
   `tools/ab_compare/result_current.json` 逐组核对一致（差异 < 0.01pp）。
   若今后再改动 `core/`，请重跑以下三个脚本 + `run_orphan_backtests.py`，

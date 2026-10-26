@@ -19,7 +19,7 @@
     python scripts/data/update_data.py --check  # 只查看数据新旧，不写任何文件
 
 本地可挂 Windows 计划任务每日运行；GitHub Actions 中由
-.github/workflows/update-dashboard.yml 定时调用。
+.github/workflows/update-data.yml 定时调用。
 """
 # === PROJECT-ROOT BOOTSTRAP ===
 # 重构后代码分层（core/ scripts/ tools/），此前言保证脚本从任何目录调用都可用：
@@ -48,7 +48,7 @@ if sys.platform.startswith('win'):
         pass
 
 H20269_CSV = 'data/H20269历史数据.csv'
-ETF_CSV = 'data/512890行情数据.csv'   # 看板专用；回测用的 512890历史数据.csv 不动
+ETF_CSV = 'data/512890行情数据.csv'   # 留档/看板副项目用；回测的 512890历史数据.csv 不动
 ETF_CODE = '512890'
 
 UA = ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
@@ -179,7 +179,7 @@ def fetch_etf_tencent():
 
 
 def update_etf(check_only=False):
-    """全量刷新看板专用的 ETF 前复权序列。"""
+    """全量刷新 ETF 前复权序列（留档/看板副项目用）。"""
     source = 'eastmoney'
     try:
         recs = fetch_etf_eastmoney()
@@ -199,7 +199,7 @@ def update_etf(check_only=False):
     for d, close, vol in recs:
         pct = (close / prev_close - 1) * 100 if prev_close else None
         prev_close = close
-        # 与 512890历史数据.csv 同构；开高低未知列留空（看板只用日期/收盘）
+        # 与 512890历史数据.csv 同构；开高低未知列留空（只用日期/收盘）
         out_lines.append(f'{d},{close:.3f},,,,{vol:.1f},'
                          + (f'{pct:.2f}%' if pct is not None else ''))
 
